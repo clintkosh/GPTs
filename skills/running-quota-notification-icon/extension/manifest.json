@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Clintware Work Quota Indicator",
+  "version": "1.0.0",
+  "description": "Adds an always-visible work quota indicator with honest unavailable and locally estimated modes.",
+  "permissions": ["storage", "notifications"],
+  "host_permissions": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
+      "js": ["content.js"],
+      "css": ["quota.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_title": "Work quota settings"
+  }
+}
