@@ -150,6 +150,39 @@ Generate playbooks from the company's product/customer model. Common patterns in
 - expansion discovery
 - program maturity review
 
+## Generated tool quality standard
+
+Any interactive helper added to a CRM — including signal recommenders, classifiers, calculators, health-score tools, playbook generators, prioritizers, search/filter logic, next-best-action engines, or similar utilities — must be implemented as a real input-sensitive tool rather than a decorative demo control.
+
+For every such tool:
+
+- map the realistic input dimensions before implementation; do not reduce the tool to one or two obvious keywords when the domain contains multiple meaningful variables
+- support multiple distinct categories and materially different outputs
+- handle compound inputs containing more than one signal and combine or prioritize recommendations where appropriate
+- use surrounding context when available, such as the selected account, active playbook, renewal timing, health state, percentages, urgency language, stakeholder state, product/module, support severity, or onboarding stage
+- extract useful structured facts from free text when practical, such as dates, day counts, percentages, severity indicators, stages, or named workflow types
+- provide a structured result rather than a generic sentence when the decision is multidimensional; useful fields include classification, urgency, recommended action, owner, evidence to collect, timing, and next checkpoint
+- avoid a single canned fallback that is returned for unrelated inputs; unknown inputs must receive a context-aware generic response that reflects the actual text supplied and asks for or identifies the missing decision variables
+- never pretend that simple deterministic rules are an LLM or AI model; label the mechanism accurately
+- keep synthetic/demo status explicit when the tool operates on synthetic data
+- add privacy-conscious analytics for meaningful tool use when analytics are enabled, using neutral classifications rather than raw sensitive free text
+- preserve keyboard accessibility, responsive behavior, and light/dark readability
+
+### Required regression tests for generated tools
+
+Before declaring a generated tool complete, test it with a deliberately varied matrix rather than one happy-path input. At minimum include:
+
+1. several single-category inputs that should produce different outputs
+2. at least two compound/multi-signal inputs
+3. an urgency or time-sensitive case
+4. a numeric case when the tool accepts numbers, percentages, dates, or thresholds
+5. a vague/unknown case
+6. an empty or malformed input case
+7. a context-specific invocation, such as launching from a named playbook or account state, when context exists
+8. repeated inputs to confirm deterministic tools are stable and state does not leak between runs
+
+A tool fails validation if materially different realistic inputs collapse to the same recommendation without a defensible reason. Fix the logic before completion rather than documenting the limitation as acceptable.
+
 ## PDF CSM field guide
 
 Automatically create a PDF guide for the CSM using the same visual theme as the CRM. The guide should explain:
@@ -183,6 +216,7 @@ At minimum verify:
 - account filters/search work
 - account details open
 - playbook buttons/actions work
+- every generated helper/tool passes the varied-input regression standard above
 - PDF guide exists and renders cleanly
 - no company-named public route bypasses the gate when the deployment architecture allows that to be prevented
 - mobile/responsive layout does not collapse into unusable controls
@@ -197,6 +231,7 @@ Return a compact completion report containing:
 - default theme and light/dark toggle status
 - neutral analytics `demo_id`
 - tracked event names
+- generated tool regression result
 - PDF guide link/path
 - repository/commit if applicable
 - validation result
