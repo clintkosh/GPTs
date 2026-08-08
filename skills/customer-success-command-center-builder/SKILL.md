@@ -10,7 +10,8 @@ Every run must produce all of the following unless the user explicitly opts out:
 2. A neutral password gate shown before company-specific content.
 3. A secure access password. If the user supplies a password, use it. Otherwise generate a random password and reveal it in the completion message.
 4. A matching PDF CSM field guide using the same company-inspired color/typography system.
-5. A completion summary with the live/intended route, password, generated files, and any deployment steps still requiring account-owner action.
+5. Shared analytics instrumentation for gate views, successful unlocks, failed unlocks, guide opens, account opens, playbook actions, filter usage, and meaningful CRM engagement.
+6. A completion summary with the live/intended route, password, analytics `demo_id`, generated files, and any deployment steps still requiring account-owner action.
 
 ## Privacy gate rules
 
@@ -41,6 +42,33 @@ while True:
 ```
 
 Never substitute a memorable default like `Password123!`. Reveal the generated password in the user-facing completion message. Do not expose it on the pre-login page.
+
+## Analytics and engagement tracking
+
+Analytics are mandatory unless the user explicitly opts out.
+
+When the host already has a first-party analytics property, use that property instead of creating a new property for every demo. Give each CRM a unique neutral `demo_id`, normally derived from its neutral codename, for example `summertime_2026`.
+
+Do not send the target company name, recipient name, recipient email, password, synthetic customer names, or other identifying/private values as analytics parameters. Keep analytics identifiers neutral.
+
+Standard event schema:
+
+- `crm_gate_view` — neutral password page loaded
+- `crm_unlock_success` — correct password successfully unlocked the CRM
+- `crm_unlock_failed` — incorrect password attempt
+- `crm_guide_open` — CSM PDF guide opened
+- `crm_account_open` — synthetic account drill-down opened
+- `crm_playbook_run` — playbook/action launched
+- `crm_filter_use` — portfolio/account filter changed
+- `crm_session_engaged` — first meaningful unlocked CRM interaction
+
+Every event should include at least `demo_id` and `host`. Add only non-identifying operational parameters such as `playbook_type`, `guide_name`, `filter_type`, or synthetic `account_segment` when useful.
+
+For email attribution, use neutral UTM/campaign names or a neutral per-link reference token. Do not put the target company or named recipient into a visible URL unless the user explicitly asks for that.
+
+Where Google Analytics 4 / gtag is used, preserve the site's existing measurement ID and fire custom events with `gtag('event', ...)`. Validate events in Realtime or DebugView when access permits. Recommend registering `demo_id` as an event-scoped custom dimension and marking `crm_unlock_success` as a Key event.
+
+The completion report must state the exact `demo_id` and event names so the user can find them in analytics.
 
 ## Company research and theming
 
@@ -124,6 +152,10 @@ At minimum verify:
 - sign-in page contains no visible target-company identification
 - wrong password fails
 - correct password unlocks
+- `crm_gate_view` fires on load
+- `crm_unlock_failed` fires on an incorrect password
+- `crm_unlock_success` fires on successful unlock
+- guide/account/playbook/filter events fire where implemented
 - app navigation works
 - account filters/search work
 - account details open
@@ -139,9 +171,11 @@ Return a compact completion report containing:
 - what was built
 - public/intended route
 - password (generated or supplied)
+- neutral analytics `demo_id`
+- tracked event names
 - PDF guide link/path
 - repository/commit if applicable
 - validation result
-- exact remaining DNS/hosting steps if any
+- exact remaining DNS/hosting/analytics-admin steps if any
 
 If a random password was generated, place it prominently in the completion message so the user does not lose it.
