@@ -10,8 +10,9 @@ Every run must produce all of the following unless the user explicitly opts out:
 2. A neutral password gate shown before company-specific content.
 3. A secure access password. If the user supplies a password, use it. Otherwise generate a random password and reveal it in the completion message.
 4. A matching PDF CSM field guide using the same company-inspired color/typography system.
-5. Shared analytics instrumentation for gate views, successful unlocks, failed unlocks, guide opens, account opens, playbook actions, filter usage, and meaningful CRM engagement.
-6. A completion summary with the live/intended route, password, analytics `demo_id`, generated files, and any deployment steps still requiring account-owner action.
+5. Shared analytics instrumentation for gate views, successful unlocks, failed unlocks, guide opens, account opens, playbook actions, filter usage, theme changes, and meaningful CRM engagement.
+6. A persistent light/dark mode toggle inside the unlocked CRM.
+7. A completion summary with the live/intended route, password, analytics `demo_id`, generated files, and any deployment steps still requiring account-owner action.
 
 ## Privacy gate rules
 
@@ -60,9 +61,10 @@ Standard event schema:
 - `crm_account_open` — synthetic account drill-down opened
 - `crm_playbook_run` — playbook/action launched
 - `crm_filter_use` — portfolio/account filter changed
+- `crm_theme_toggle` — user changes light/dark appearance; parameter `theme` is `light` or `dark`
 - `crm_session_engaged` — first meaningful unlocked CRM interaction
 
-Every event should include at least `demo_id` and `host`. Add only non-identifying operational parameters such as `playbook_type`, `guide_name`, `filter_type`, or synthetic `account_segment` when useful.
+Every event should include at least `demo_id` and `host`. Add only non-identifying operational parameters such as `playbook_type`, `guide_name`, `filter_type`, `theme`, or synthetic `account_segment` when useful.
 
 For email attribution, use neutral UTM/campaign names or a neutral per-link reference token. Do not put the target company or named recipient into a visible URL unless the user explicitly asks for that.
 
@@ -88,6 +90,24 @@ Use the actual public font family when it can be verified from the live site or 
 Do not redistribute proprietary font files. A generated PDF may use a metrically similar system font if the exact web font is unavailable in the generation environment.
 
 The goal is to feel native to the target company's current design language without copying proprietary logos, source code, or protected artwork.
+
+## Light and dark mode
+
+Every generated CRM must include a compact light/dark toggle inside the unlocked application. The pre-login gate remains neutral and is not required to expose the toggle.
+
+The theme system must:
+
+- preserve the target company's visual identity in both modes rather than applying a generic inversion
+- default to the mode that most closely matches the source company's current website
+- persist the user's selection in `localStorage`
+- restore the saved mode on the next visit
+- update cards, tables, forms, modal surfaces, navigation, status colors, borders, text, and charts/readability together
+- retain sufficient contrast in both modes
+- expose accessible button labeling such as `Switch to light mode` / `Switch to dark mode`
+- avoid flashing company-specific content before unlock
+- fire `crm_theme_toggle` when analytics are enabled, with only the neutral `theme` value
+
+If the company site is predominantly dark, use dark as the initial default; if predominantly light, use light. Do not force operating-system preference over the company-matched default unless the user explicitly requests system-mode behavior.
 
 ## CRM operating model
 
@@ -155,7 +175,10 @@ At minimum verify:
 - `crm_gate_view` fires on load
 - `crm_unlock_failed` fires on an incorrect password
 - `crm_unlock_success` fires on successful unlock
-- guide/account/playbook/filter events fire where implemented
+- guide/account/playbook/filter/theme events fire where implemented
+- light/dark toggle visibly changes the CRM
+- theme selection persists across reloads
+- both themes preserve readable contrast and usable controls
 - app navigation works
 - account filters/search work
 - account details open
@@ -171,6 +194,7 @@ Return a compact completion report containing:
 - what was built
 - public/intended route
 - password (generated or supplied)
+- default theme and light/dark toggle status
 - neutral analytics `demo_id`
 - tracked event names
 - PDF guide link/path
