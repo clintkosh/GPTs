@@ -1,0 +1,45 @@
+name: Build QuotaWatch EXE
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "windows/QuotaWatch/Program.cs"
+      - "windows/QuotaWatch/QuotaWatch.csproj"
+      - "windows/QuotaWatch/app.manifest"
+      - ".github/workflows/build-quotawatch.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Build lightweight Windows executable
+        shell: pwsh
+        run: |
+          dotnet build .\windows\QuotaWatch\QuotaWatch.csproj -c Release
+          New-Item -ItemType Directory -Force .\windows\QuotaWatch\dist | Out-Null
+          Copy-Item .\windows\QuotaWatch\bin\Release\net48\QuotaWatch.exe .\windows\QuotaWatch\dist\QuotaWatch.exe -Force
+          $size=(Get-Item .\windows\QuotaWatch\dist\QuotaWatch.exe).Length
+          if ($size -lt 10000 -or $size -gt 2000000) { throw "Unexpected EXE size: $size" }
+          $bytes=[System.IO.File]::ReadAllBytes((Resolve-Path .\windows\QuotaWatch\dist\QuotaWatch.exe))
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "Built file is not a Windows PE executable" }
+          Write-Host "QuotaWatch.exe validated: $size bytes"
+      - name: Publish executable back to GitHub
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add windows/QuotaWatch/dist/QuotaWatch.exe
+          if (git diff --cached --quiet) { Write-Host "Executable unchanged"; exit 0 }
+          git commit -m "Build QuotaWatch Windows executable"
+          git push
