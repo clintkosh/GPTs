@@ -2,312 +2,118 @@
 
 Build a private, interview-ready Customer Success CRM / command-center demo for a target company from public company context plus any user-supplied interview/job context.
 
-## Non-negotiable product boundary: metrics, records, and workflows only
+## Product boundary: metrics, records, and workflows only
 
-By default, generated CRMs are **measurement and record systems**, not recommendation engines.
+By default, generated CRMs are measurement and record systems, not recommendation engines.
 
-Do not add or regenerate any of the following unless the user explicitly overrides this rule in the current request:
+Do not add or regenerate these unless the user explicitly overrides this rule in the current request:
 
-- signal recommenders or free-text signal classifiers
+- signal recommenders or free-text classifiers
 - keyword-based pattern guessing
 - sentiment analysis
 - next-best-action engines
 - inferred playbook selection
-- inferred renewal/growth/expansion suggestions
-- AI-generated customer strategy
-- automatic assignment of an action based on prose input
+- inferred renewal, growth, expansion, or upsell suggestions
+- AI-generated account strategy
+- automatic action assignment from prose input
 - controls that claim to detect meaning or intent from notes, meetings, emails, or other free text
 
 Free-text notes and meeting records are storage/display/search inputs only. Do not analyze them to produce advice.
 
-Allowed derived behavior is limited to transparent calculations from explicit structured fields, including:
-
-- sums, averages, ratios, percentages, deltas, durations, dates, and counts
-- disclosed weighted health scores
-- disclosed threshold/status bands
-- deterministic SLA or lifecycle comparisons
-- completion percentages
-- renewal-day calculations
-- factual rollups of stored structured values
-- meeting briefs that assemble stored metrics, goals, stakeholders, meetings, actions, and notes without inventing recommendations
+Allowed derived behavior is limited to transparent calculations from explicit structured fields, including sums, averages, ratios, percentages, deltas, durations, dates, counts, disclosed weighted health scores, disclosed threshold/status bands, deterministic SLA/lifecycle comparisons, completion percentages, renewal-day calculations, factual rollups, and meeting briefs assembled from stored data.
 
 If a status such as `Healthy`, `Watch`, or `At risk` is displayed, publish the exact formula/threshold that produces it. A calculated flag may state the value and breached threshold, but it must not invent the action to take.
 
 Static playbooks are allowed as reference checklists. They must not be automatically selected, ranked, or recommended from customer text or inferred patterns.
 
+## Non-blocking omission policy
+
+This boundary is a feature-level guard, not a project-level kill switch.
+
+If a proposed, generated, inherited, or optional feature violates the product boundary:
+
+1. Omit or skip that feature/version.
+2. Continue building, validating, and deploying all unrelated requested CRM functionality.
+3. Do not fail the whole project merely because that optional feature was attempted or found.
+4. Do not spend time searching for a replacement recommendation/classification feature unless the user explicitly asks for one.
+5. Do not broaden the task into investigating why that optional feature might have been useful.
+6. If safe automatic removal is possible, remove only the isolated optional feature. Do not delete shared application code or unrelated functionality to enforce the guard.
+7. If the feature cannot be safely isolated automatically, leave it for the next source edit, report it as a non-blocking cleanup item, and continue the rest of the build.
+8. Only treat the overall project as failed when a core requested function cannot be completed or the build itself is unusable.
+
+Completion reports may say an optional disallowed feature was skipped. They should not characterize the entire CRM as failed because of it.
+
 ## Required outputs
 
-Every run must produce all of the following unless the user explicitly opts out:
+Every run must produce these unless the user explicitly opts out:
 
-1. A self-contained interactive CRM/CSM command-center web app.
-2. A neutral password gate shown before company-specific content.
-3. A secure access password. If the user supplies a password, use it. Otherwise generate a secure random password and reveal it in the completion message.
-4. A matching PDF CSM field guide using the same company-inspired color/typography system.
-5. Shared privacy-conscious analytics for access and meaningful CRM use.
-6. A persistent light/dark mode toggle inside the unlocked CRM.
+1. Self-contained interactive CRM/CSM command-center web app.
+2. Neutral password gate before company-specific content.
+3. Secure supplied or generated password.
+4. Matching PDF CSM field guide.
+5. Privacy-conscious analytics for access and meaningful CRM use.
+6. Persistent light/dark mode inside the unlocked CRM.
 7. Rich account workspaces with expected CSM records.
-8. A completion summary with route, password, analytics `demo_id`, generated files, formulas/thresholds, validation result, and remaining owner-only deployment steps.
+8. Completion summary with route, password, `demo_id`, formulas/thresholds, files, validation, skipped optional features if any, and remaining owner-only deployment steps.
 
 ## Required account workspace
 
-Every generated account workspace should include the fields relevant to the target SaaS model and, when applicable:
-
-- account name, industry, segment, ARR/value, lifecycle stage
-- contract start and end dates
-- renewal date or days remaining
-- structured health inputs and calculated health score
-- adoption / usage / telemetry / technical coverage metrics
-- outcome-evidence metrics
-- stakeholder/champion coverage
-- support/escalation records
-- customer success-plan objectives, owners, proof definitions, and progress
-- product/module entitlements and adoption state
-- integrations and technical-owner context
-- CSM, Technical Success, Sales/AE, Services, Support, or other internal ownership as relevant
-- meeting history
-- account notes
-- customer employee / stakeholder directory
+Include fields relevant to the target SaaS model, such as account name, industry, segment, ARR/value, lifecycle stage, contract start/end dates, renewal date/days remaining, structured health inputs and calculated health, adoption/usage/telemetry/coverage metrics, outcome-evidence metrics, stakeholder/champion coverage, support/escalation records, success-plan objectives/owners/proof/progress, product/module entitlements, integrations, technical-owner context, internal owners, meeting history, account notes, and customer employee/stakeholder directory.
 
 ### Required record-entry controls
 
-Account workspaces must support these record actions by default:
+Every account workspace must support by default:
 
-1. **Add account note**
-   - timestamp
-   - factual note text
-   - display in the account's note history
-   - edit/delete where practical
+1. **Add account note** — timestamp, factual note text, history display, edit/delete where practical.
+2. **Add meeting log** — date, meeting type/title, attendees, factual notes/decisions/measurements/commitments, chronological history, edit/delete where practical.
+3. **Add employee / stakeholder** — name, role/title, relationship/status, responsibility/stakeholder lane, stakeholder-map display, edit/delete where practical.
 
-2. **Add meeting log**
-   - meeting date
-   - meeting type/title
-   - attendees
-   - factual notes / decisions / measurements / commitments
-   - display in chronological meeting history
-   - edit/delete where practical
+`localStorage` is acceptable for an interview/demo prototype when clearly labeled as a demo mechanism, not an enterprise system-of-record architecture. Do not analyze newly entered records to infer sentiment, risk, next action, expansion opportunity, or customer intent.
 
-3. **Add employee / stakeholder**
-   - name
-   - role/title
-   - relationship/status
-   - responsibility / stakeholder lane
-   - display in the account stakeholder map
-   - edit/delete where practical
+## Privacy gate
 
-These records may persist in `localStorage` for an interview/demo prototype. Clearly state that browser-local persistence is a demo mechanism, not an enterprise system-of-record design. In a production architecture, use the authorized governed backend/system of record.
-
-Do not analyze newly entered records to infer sentiment, risk, next action, expansion opportunity, or customer intent.
-
-## Privacy gate rules
-
-Before unlock, do not visibly reveal the target company name, logo, product names, customer names, or other identifying copy. Use neutral text such as `Private Customer Success Demo`.
-
-Prefer a neutral hostname such as `<codename>-crmdemo.example.com`. Do not place the target company name in the public URL unless the user explicitly asks for it.
-
-Add `noindex,nofollow,noarchive,nosnippet` to the sign-in page.
-
-If the hosting environment supports server-side authentication, Cloudflare Access, a Worker, or another edge/server gate, prefer that. If only a static host is available, implement a client-side presentation gate and clearly classify it as a lightweight demo gate rather than server-side security.
+Before unlock, do not visibly reveal the target company name, logo, product names, customer names, or identifying copy. Prefer a neutral hostname/codename and add `noindex,nofollow,noarchive,nosnippet`. Prefer server-side or edge authentication when available; otherwise classify a static client-side gate as a lightweight presentation gate.
 
 ## Password generation
 
-If no password is supplied, generate one with a cryptographically secure RNG. Default length: 20 characters. Include uppercase, lowercase, digits, and symbols while avoiding characters that commonly break HTML/JavaScript embedding (`'`, `"`, `\\`, backtick).
+If no password is supplied, generate a cryptographically secure 20-character password with uppercase, lowercase, digits, and safe symbols from `!@#$%^&*_-+=`, avoiding quotes, backslashes, and backticks. Reveal it only in the completion message, not on the pre-login page.
 
-```python
-import secrets, string
-alphabet = string.ascii_letters + string.digits + "!@#$%^&*_-+="
-while True:
-    password = ''.join(secrets.choice(alphabet) for _ in range(20))
-    if (any(c.islower() for c in password)
-        and any(c.isupper() for c in password)
-        and any(c.isdigit() for c in password)
-        and any(c in "!@#$%^&*_-+=" for c in password)):
-        break
-```
+## Analytics
 
-Never substitute a memorable default like `Password123!`. Reveal the generated password in the user-facing completion message. Do not expose it on the pre-login page.
+Reuse an existing first-party analytics property when available. Give each demo a neutral `demo_id`. Useful events include `crm_gate_view`, `crm_unlock_success`, `crm_unlock_failed`, `crm_guide_open`, `crm_account_open`, `crm_account_workspace_open`, `crm_filter_use`, `crm_theme_toggle`, `crm_session_engaged`, `crm_account_note_add`, `crm_meeting_log_add`, `crm_stakeholder_add`, and `crm_meeting_brief_generate`.
 
-## Analytics and engagement tracking
-
-Analytics are mandatory unless the user explicitly opts out.
-
-Reuse the host site's existing first-party analytics property when available. Assign every CRM a unique neutral `demo_id`.
-
-Standard event schema should include, as implemented:
-
-- `crm_gate_view`
-- `crm_unlock_success`
-- `crm_unlock_failed`
-- `crm_guide_open`
-- `crm_account_open` / `crm_account_workspace_open`
-- `crm_filter_use`
-- `crm_theme_toggle`
-- `crm_session_engaged`
-- `crm_account_note_add`
-- `crm_meeting_log_add`
-- `crm_stakeholder_add`
-- `crm_meeting_brief_generate`
-
-Do not send target-company names, recipient names/emails, passwords, free-text notes, meeting text, stakeholder names, or other identifying/private values as analytics parameters. Use only neutral operational parameters such as `demo_id`, `host`, synthetic segment, filter type, or theme.
+Never send company names, recipient data, passwords, free-text notes, meeting text, stakeholder names, or other identifying/private values as analytics parameters.
 
 ## Company research and theming
 
-Research the target company's current public website before designing. Extract or infer:
+Research the target company's current public website before designing. Match color relationships, light/dark balance, spacing, density, radius, typography, navigation, buttons, and hierarchy without copying proprietary source, artwork, or redistributing proprietary fonts. Use a verified public font only when safe; otherwise use a close fallback and disclose it.
 
-- primary and secondary brand colors
-- background/light-dark balance
-- button/accent treatment
-- card radius, density, and borders
-- typography family and fallback stack
-- headline weight and letter spacing
-- navigation style
-- visual hierarchy
+## Light/dark mode
 
-Use an exact public font only when it can be verified and safely reused. Do not redistribute proprietary font files. Otherwise use a close system/web-safe fallback and disclose it.
+Every CRM must include a compact persistent light/dark toggle after unlock. Default to the mode that best matches the current company site. Persist the choice in `localStorage`, update all major surfaces together, preserve readable contrast, and track only the neutral `theme` value when analytics are enabled.
 
-The goal is to feel native to the target company's design language without copying proprietary logos, source code, or protected artwork.
+## Metrics and health
 
-## Light and dark mode
-
-Every generated CRM must include a compact light/dark toggle after unlock.
-
-The theme system must:
-
-- preserve the target company's visual identity in both modes
-- default to the mode that best matches the current company website
-- persist the user's selection in `localStorage`
-- restore it on revisit
-- update all major surfaces together
-- preserve readable accessible contrast
-- expose clear accessible labeling
-- avoid flashing company-specific content before unlock
-- fire `crm_theme_toggle` with only the neutral `theme` value when analytics are enabled
-
-## CRM operating model
-
-Map the CRM to the company's real post-sales/customer journey rather than a generic sales database. Include relevant structured measurements for:
-
-- portfolio command center
-- managed ARR / account segmentation
-- account health
-- onboarding and time-to-value
-- product/module adoption
-- telemetry or usage coverage
-- outcome realization
-- stakeholder/champion coverage
-- executive sponsor status
-- support burden and escalations
-- renewal timing
-- QBR/EBR evidence readiness
-- success plans
-- static playbook/checklist library
-
-Use synthetic customer/account data unless real data was explicitly supplied and authorized.
-
-## Health scoring
-
-Health must be reproducible and explainable.
-
-Prefer a weighted score combining explicit structured fields such as adoption, outcome realization, stakeholder strength, support confidence/burden, technical coverage, and commercial timing. Display:
-
-- formula
-- input values
-- weights
-- final calculated score
-- status thresholds
-- which thresholds were breached
-
-Do **not** turn the score into an automatically generated CSM recommendation.
-
-## Static playbook library
-
-Generate playbooks from the company's product/customer model as static reference checklists. Common patterns include:
-
-- executive sponsor reset checklist
-- adoption review checklist
-- technical coverage recovery checklist
-- critical support escalation checklist
-- renewal review checklist
-- value-evidence/QBR preparation checklist
-- program maturity review checklist
-- privacy/governance checklist
-- integration review checklist
-
-No automatic selection or recommendation based on customer text is allowed by default.
+Health must be reproducible and explainable. Prefer a weighted score from explicit structured fields such as adoption, outcome realization, stakeholder strength, technical coverage, support confidence/burden, and commercial timing. Display the formula, input values, weights, final score, status thresholds, and breached thresholds. Do not turn the score into an automatically generated recommendation.
 
 ## Meeting brief
 
-A generated meeting brief may assemble:
+A meeting brief may assemble only stored/calculated facts: metrics, threshold flags, account objective, stakeholder list, success-plan goals/progress, meeting history, account notes, and manually recorded actions/commitments. It must not invent recommended discussion, next-best action, strategy, expansion idea, or inferred customer intent.
 
-- calculated structured metrics
-- threshold flags
-- account objective
-- stakeholder list
-- stored success-plan goals/progress
-- stored meeting history
-- stored account notes
-- open manually recorded actions/commitments
+## Static playbooks
 
-It must not invent a recommended discussion, next-best action, strategy, expansion idea, or inferred customer intent.
+Generate static reference/checklist content mapped to the company/product model. No automatic selection, ranking, or recommendation based on customer text is allowed by default.
 
-## PDF CSM field guide
+## PDF field guide
 
-Automatically create a PDF guide using the same visual theme. The guide should explain:
+Generate a PDF guide in the same visual theme explaining navigation, exact health formula and thresholds, company-specific structured outcome metrics, account workspace and record-entry workflows, onboarding/TTV measurement milestones, QBR/EBR evidence and meeting records, post-sales ownership, renewal measurement, static playbooks/checklists, and a 60-second interview demo path. State clearly that free-text pattern guessing and generated recommendations are excluded by default. Visually inspect the PDF before completion.
 
-1. How to use the command center.
-2. Exact health-score formula and thresholds.
-3. Company-specific structured customer outcome metrics.
-4. Account workspace and record-entry workflow.
-5. Day 0-90 onboarding/TTV measurement milestones.
-6. QBR/EBR evidence and meeting-record flow.
-7. Support / Technical Success / Services ownership model where relevant.
-8. Renewal measurement model.
-9. Static playbook/checklist library.
-10. A 60-second interview demonstration path.
+## Validation
 
-The PDF must explicitly state that the CRM does not use free-text pattern guessing or generated recommendations by default.
+Verify the neutral gate, password failure/success, analytics where implemented, light/dark persistence, navigation, filters, account workspace, add-note persistence, add-meeting persistence, add-stakeholder persistence, edit/delete where implemented, exact health calculation, exact threshold flags, factual-only meeting briefs, static playbooks, and responsive layout.
 
-Render the PDF to page images and visually inspect every page for clipping, overlaps, broken tables, or missing glyphs before completion.
-
-## Validation before completion
-
-At minimum verify:
-
-- sign-in page contains no visible target-company identification
-- wrong password fails
-- correct password unlocks
-- access and engagement analytics fire where implemented
-- light/dark mode works and persists
-- app navigation works
-- account filters/search work
-- account workspace opens
-- account note can be added and persists
-- meeting log can be added and persists
-- employee/stakeholder can be added and persists
-- deletion/edit behavior works where implemented
-- calculated health matches the published formula
-- threshold flags match the published rules
-- meeting brief contains only stored/calculated facts
-- playbooks are static and do not auto-select
-- no recommender/classifier/signal engine/next-best-action code remains
-- free-text notes/meetings are not analyzed for inferred meaning
-- PDF guide exists and renders cleanly
-- mobile/responsive layout remains usable
-
-Treat the build as failed if recommendation/classifier code is present without a current explicit user override.
+If prohibited optional recommendation/classification functionality appears without a current explicit user override, skip/remove that optional feature where safe and continue validation of the rest of the project. Record it as a skipped or cleanup item rather than failing the entire build.
 
 ## Completion message
 
-Return a compact completion report containing:
-
-- what was built
-- public/intended route
-- password
-- default theme and light/dark status
-- neutral analytics `demo_id`
-- tracked event names
-- published health formula and thresholds
-- account write controls implemented
-- PDF guide link/path
-- repository/commit if applicable
-- validation result
-- exact remaining DNS/hosting/analytics-admin steps if any
+Return a compact report with what was built, route, password, theme, `demo_id`, tracked events, published formula/thresholds, account write controls, skipped optional features if any, PDF link/path, repository/commit, validation result, and exact remaining owner-only steps.
