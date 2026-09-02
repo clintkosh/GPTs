@@ -4,6 +4,14 @@ Free, public prompts, skills, and implementation specifications from Clintware.
 
 ## Available skills
 
+### Master Prompt Accuracy & Efficiency
+
+Preflights complex requests, compacts them into precise operational instructions, preserves existing work, minimizes scope drift and unnecessary regeneration, applies minimal diffs, and verifies completion before claiming success.
+
+- [View GPT instructions](skills/master-prompt-accuracy-efficiency/GPT_INSTRUCTIONS.md)
+- [Read the skill](skills/master-prompt-accuracy-efficiency/SKILL.md)
+- [Open the public catalog](https://gpts.clintware.com/)
+
 ### Recruiter Reachout Precheck
 
 Pre-screens unsolicited recruiter, staffing, LinkedIn, and job-search outreach using supplied screenshots, conversation text, names, titles, companies, profile links, job links, and related context. Separates self-asserted claims from independent verification, assigns a provisional risk level, generates proving questions, and drafts a verification reply.
